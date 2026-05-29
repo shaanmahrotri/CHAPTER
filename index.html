@@ -31,9 +31,9 @@
       if (!en || !cy) return;
       if (lang === 'cy') {
         en.style.opacity = '0.4'; en.style.borderBottom = 'none';
-        cy.style.opacity = '1'; cy.style.borderBottom = '1px solid #fff'; cy.style.paddingBottom = '1px';
+        cy.style.opacity = '1'; cy.style.borderBottom = '2px solid #ADFF2F'; cy.style.paddingBottom = '2px';
       } else {
-        en.style.opacity = '1'; en.style.borderBottom = '1px solid #fff'; en.style.paddingBottom = '1px';
+        en.style.opacity = '1'; en.style.borderBottom = '2px solid #ADFF2F'; en.style.paddingBottom = '2px';
         cy.style.opacity = '0.4'; cy.style.borderBottom = 'none'; cy.style.paddingBottom = '0';
       }
     }
@@ -69,16 +69,16 @@
       }
       var t = document.createElement('div');
       t.id = 'lang-toggle';
-      t.style.cssText = 'position:fixed;top:24px;right:32px;z-index:2147483647;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:11px;letter-spacing:3px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;cursor:pointer;';
+      t.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:2147483647;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;letter-spacing:4px;font-weight:700;color:#ADFF2F;display:flex;align-items:center;gap:8px;cursor:pointer;';
       var en = document.createElement('span');
       en.id = 'btn-en'; en.textContent = 'EN';
-      en.style.cssText = 'opacity:1;border-bottom:1px solid #fff;padding-bottom:1px;cursor:pointer;';
+      en.style.cssText = 'opacity:1;border-bottom:2px solid #ADFF2F;padding-bottom:2px;cursor:pointer;';
       en.onclick = function(){ switchLang('en'); };
       var sep = document.createElement('span');
       sep.textContent = '·'; sep.style.opacity = '0.4';
       var cy = document.createElement('span');
       cy.id = 'btn-cy'; cy.textContent = 'CY';
-      cy.style.cssText = 'opacity:0.4;cursor:pointer;';
+      cy.style.cssText = 'opacity:0.5;cursor:pointer;';
       cy.onclick = function(){ switchLang('cy'); };
       t.appendChild(en); t.appendChild(sep); t.appendChild(cy);
       document.body.appendChild(t);
