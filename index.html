@@ -54,6 +54,27 @@
         tryTranslate();
       }
     }
+    function getLeftPanelWidth() {
+      var best = 0;
+      Array.from(document.querySelectorAll('*')).forEach(function(el) {
+        if (el.id === 'lang-toggle' || el.id === 'google_translate_element') return;
+        var s = window.getComputedStyle(el);
+        if (s.position !== 'fixed' && s.position !== 'absolute') return;
+        var r = el.getBoundingClientRect();
+        if (r.left < 20 && r.width > 20 && r.height > 100) {
+          best = Math.max(best, r.right);
+        }
+      });
+      return best;
+    }
+    function positionToggle() {
+      var t = document.getElementById('lang-toggle');
+      if (!t) return;
+      var lw = getLeftPanelWidth();
+      t.style.left = lw + 'px';
+      t.style.right = '0';
+      t.style.width = (window.innerWidth - lw) + 'px';
+    }
     function ensureToggle() {
       if (document.getElementById('lang-toggle')) return;
       // Re-inject GT element if needed
@@ -69,7 +90,7 @@
       }
       var t = document.createElement('div');
       t.id = 'lang-toggle';
-      t.style.cssText = 'position:fixed;top:24px;left:0;right:0;width:100%;justify-content:center;z-index:2147483647;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;letter-spacing:4px;font-weight:700;color:#F72119;display:flex;align-items:center;gap:8px;cursor:pointer;';
+      t.style.cssText = 'position:fixed;top:24px;left:0;right:0;z-index:2147483647;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;letter-spacing:4px;font-weight:700;color:#F72119;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;';
       var en = document.createElement('span');
       en.id = 'btn-en'; en.textContent = 'EN';
       en.style.cssText = 'opacity:1;border-bottom:2px solid #F72119;padding-bottom:2px;cursor:pointer;';
@@ -82,6 +103,9 @@
       cy.onclick = function(){ switchLang('cy'); };
       t.appendChild(en); t.appendChild(sep); t.appendChild(cy);
       document.body.appendChild(t);
+      // Measure and reposition once page has settled
+      setTimeout(positionToggle, 600);
+      setTimeout(positionToggle, 1500);
     }
     var _ti = setInterval(ensureToggle, 200);
     setTimeout(function(){ clearInterval(_ti); ensureToggle(); }, 10000);
