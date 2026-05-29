@@ -64,15 +64,22 @@
         tryTranslate();
       }
     }
+    function ensureToggle() {
+      if (!document.getElementById('lang-toggle')) {
+        var t = document.createElement('div');
+        t.id = 'lang-toggle';
+        t.innerHTML = '<span id="btn-en" onclick="switchLang(\'en\')">EN</span><span id="btn-sep">&middot;</span><span id="btn-cy" onclick="switchLang(\'cy\')">CY</span>';
+        document.body.appendChild(t);
+        setLangUI('en');
+      }
+    }
+    // Re-inject if bundler wipes the DOM, stop after page settles
+    var _ti = setInterval(ensureToggle, 200);
+    setTimeout(function(){ clearInterval(_ti); ensureToggle(); }, 8000);
   </script>
   <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
 <body>
-  <div id="lang-toggle">
-    <span id="btn-en" onclick="switchLang('en')">EN</span>
-    <span id="btn-sep">&middot;</span>
-    <span id="btn-cy" onclick="switchLang('cy')">CY</span>
-  </div>
   <div id="__bundler_thumbnail">
   <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
     <rect width="1200" height="800" fill="#000000"></rect>
