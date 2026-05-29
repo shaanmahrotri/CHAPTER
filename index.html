@@ -18,33 +18,23 @@
     </div>
   </noscript>
   <!-- Welsh / English toggle -->
-  <style>
-    .goog-te-banner-frame { display: none !important; }
-    .skiptranslate { display: none !important; }
-    body { top: 0 !important; }
-    #lang-toggle { position: fixed; top: 24px; right: 32px; z-index: 2147483647;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 11px; letter-spacing: 3px; font-weight: 700; color: #fff;
-      display: flex; align-items: center; gap: 6px; cursor: pointer; }
-    #lang-toggle span { transition: opacity 0.2s; }
-    #btn-en { opacity: 1; border-bottom: 1px solid #fff; padding-bottom: 1px; }
-    #btn-sep { opacity: 0.4; cursor: default; }
-    #btn-cy { opacity: 0.4; }
-  </style>
   <div id="google_translate_element" style="display:none"></div>
   <script>
+    var _gtInitDone = false;
     function googleTranslateElementInit() {
+      _gtInitDone = true;
       new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'cy', autoDisplay: false }, 'google_translate_element');
     }
     function setLangUI(lang) {
       var en = document.getElementById('btn-en');
       var cy = document.getElementById('btn-cy');
+      if (!en || !cy) return;
       if (lang === 'cy') {
         en.style.opacity = '0.4'; en.style.borderBottom = 'none';
         cy.style.opacity = '1'; cy.style.borderBottom = '1px solid #fff'; cy.style.paddingBottom = '1px';
       } else {
         en.style.opacity = '1'; en.style.borderBottom = '1px solid #fff'; en.style.paddingBottom = '1px';
-        cy.style.opacity = '0.4'; cy.style.borderBottom = 'none';
+        cy.style.opacity = '0.4'; cy.style.borderBottom = 'none'; cy.style.paddingBottom = '0';
       }
     }
     function switchLang(lang) {
@@ -54,28 +44,47 @@
         setLangUI('en');
         window.location.reload();
       } else {
+        var tries = 0;
         var tryTranslate = function() {
           var sel = document.querySelector('.goog-te-combo');
-          if (!sel) { setTimeout(tryTranslate, 300); return; }
-          sel.value = 'cy';
-          sel.dispatchEvent(new Event('change'));
+          if (!sel && tries++ < 20) { setTimeout(tryTranslate, 300); return; }
+          if (sel) { sel.value = 'cy'; sel.dispatchEvent(new Event('change')); }
           setLangUI('cy');
         };
         tryTranslate();
       }
     }
     function ensureToggle() {
-      if (!document.getElementById('lang-toggle')) {
-        var t = document.createElement('div');
-        t.id = 'lang-toggle';
-        t.innerHTML = '<span id="btn-en" onclick="switchLang(\'en\')">EN</span><span id="btn-sep">&middot;</span><span id="btn-cy" onclick="switchLang(\'cy\')">CY</span>';
-        document.body.appendChild(t);
-        setLangUI('en');
+      if (document.getElementById('lang-toggle')) return;
+      // Re-inject GT element if needed
+      if (!document.getElementById('google_translate_element')) {
+        var gte = document.createElement('div');
+        gte.id = 'google_translate_element';
+        gte.style.display = 'none';
+        document.body.appendChild(gte);
+        if (window.google && window.google.translate) {
+          _gtInitDone = false;
+          googleTranslateElementInit();
+        }
       }
+      var t = document.createElement('div');
+      t.id = 'lang-toggle';
+      t.style.cssText = 'position:fixed;top:24px;right:32px;z-index:2147483647;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:11px;letter-spacing:3px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;cursor:pointer;';
+      var en = document.createElement('span');
+      en.id = 'btn-en'; en.textContent = 'EN';
+      en.style.cssText = 'opacity:1;border-bottom:1px solid #fff;padding-bottom:1px;cursor:pointer;';
+      en.onclick = function(){ switchLang('en'); };
+      var sep = document.createElement('span');
+      sep.textContent = '·'; sep.style.opacity = '0.4';
+      var cy = document.createElement('span');
+      cy.id = 'btn-cy'; cy.textContent = 'CY';
+      cy.style.cssText = 'opacity:0.4;cursor:pointer;';
+      cy.onclick = function(){ switchLang('cy'); };
+      t.appendChild(en); t.appendChild(sep); t.appendChild(cy);
+      document.body.appendChild(t);
     }
-    // Re-inject if bundler wipes the DOM, stop after page settles
     var _ti = setInterval(ensureToggle, 200);
-    setTimeout(function(){ clearInterval(_ti); ensureToggle(); }, 8000);
+    setTimeout(function(){ clearInterval(_ti); ensureToggle(); }, 10000);
   </script>
   <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
